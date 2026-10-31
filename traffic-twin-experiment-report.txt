@@ -1,0 +1,20 @@
+SMART TRAFFIC DIGITAL TWIN — EXPERIMENT REPORT
+Dataset: METR-LA / los-loop: 207 LA freeway detectors, 5-min mean speed
+Evaluation window: 605 held-out intervals at 5-minute steps (first 1411 intervals used for training).
+Forecast configuration: GBT graph model; horizons 5, 15, 30 minutes.
+Selected export scope: All fog zones; Last 48 five-minute targets; 5-minute forecast.
+Selected architecture reference: edge fog cloud.
+What-if controls: incident detector 773939; severity 20 mph; 1 graph hops.
+
+KEY RESULTS
+5-minute GraphGBT network MAE: 2.658 mph
+Hierarchical control-loop p95: 26.11 ms
+Hierarchical uplink rate: 23.32 kB/hour
+Replica synchronization RMSE: 3.965 mph
+Fog congestion onset F1: 0.312
+
+OBSERVATIONS
+The graph-aware fog model's onset F1 is 0.312; its held-out 5-minute MAE is 2.658 mph. The edge-fog-cloud architecture uses 23.32 kB/hour with 26.11 ms p95 control-loop latency. Filtered time-series values and forecasts can be downloaded separately as CSV.
+
+LIMITATIONS
+Traffic-delay values use a Greenshields/Webster proxy, not a microsimulation. The interactive what-if view uses a transparent graph-diffusion counterfactual; only the saved baseline scenario was produced by CloudTwin's trained model. Sensor dropouts/spikes and WAN outages are simulated. Dashboard data is historical, not live.

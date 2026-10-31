@@ -1,0 +1,628 @@
+{
+  "fusion": {
+    "weight": 0.2,
+    "val_mae_edge_only": 2.8103267814149606,
+    "val_mae_fog_only": 2.559098879901264,
+    "val_mae_fused": 2.5362182841085095
+  },
+  "forecasting": {
+    "5min": {
+      "HistoricalAverage": {
+        "MAE": 5.006613350504945,
+        "RMSE": 8.576726163391138,
+        "MAPE": 15.98156068397006
+      },
+      "Persistence": {
+        "MAE": 2.71539502136539,
+        "RMSE": 4.393092298316469,
+        "MAPE": 6.0254008271791095
+      },
+      "GraphRidge (lightweight)": {
+        "MAE": 2.8846682929981684,
+        "RMSE": 4.395096947642113,
+        "MAPE": 6.591291727731524
+      },
+      "GraphGBT (twin)": {
+        "MAE": 2.6564881012880606,
+        "RMSE": 4.321357722256782,
+        "MAPE": 6.138368857304809
+      }
+    },
+    "15min": {
+      "HistoricalAverage": {
+        "MAE": 5.015042928873037,
+        "RMSE": 8.58850169574117,
+        "MAPE": 16.0213608659219
+      },
+      "Persistence": {
+        "MAE": 3.440355654905404,
+        "RMSE": 6.134264161084328,
+        "MAPE": 8.256462608886704
+      },
+      "GraphRidge (lightweight)": {
+        "MAE": 3.527326504248943,
+        "RMSE": 5.731242633868415,
+        "MAPE": 8.856970926275446
+      },
+      "GraphGBT (twin)": {
+        "MAE": 3.2826184111062693,
+        "RMSE": 5.751480656612713,
+        "MAPE": 8.218183917974548
+      }
+    },
+    "30min": {
+      "HistoricalAverage": {
+        "MAE": 5.029635922557399,
+        "RMSE": 8.607014735008521,
+        "MAPE": 16.083955589720297
+      },
+      "Persistence": {
+        "MAE": 4.14616994872117,
+        "RMSE": 7.781398410830247,
+        "MAPE": 10.506668162845264
+      },
+      "GraphRidge (lightweight)": {
+        "MAE": 4.023385286038832,
+        "RMSE": 6.696085652934989,
+        "MAPE": 10.732082745242117
+      },
+      "GraphGBT (twin)": {
+        "MAE": 3.7541872352098165,
+        "RMSE": 6.724088912554978,
+        "MAPE": 9.881534064680316
+      }
+    }
+  },
+  "congestion_detection": {
+    "state_classification": {
+      "Persistence": {
+        "precision": 0.8371037659170957,
+        "recall": 0.8369903833130163,
+        "f1": 0.8370470707754825,
+        "true_positives": 12359,
+        "false_positives": 2405,
+        "missed": 2407
+      },
+      "Edge Kalman (no graph)": {
+        "precision": 0.8204222914503289,
+        "recall": 0.8025870242448869,
+        "f1": 0.8114066618739516,
+        "true_positives": 11851,
+        "false_positives": 2594,
+        "missed": 2915
+      },
+      "Fog graph model": {
+        "precision": 0.8394849194325851,
+        "recall": 0.8256128944873358,
+        "f1": 0.8324911226440863,
+        "true_positives": 12191,
+        "false_positives": 2331,
+        "missed": 2575
+      }
+    },
+    "congestion_onset": {
+      "Persistence": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "true_positives": 0,
+        "false_positives": 0,
+        "missed": 2407
+      },
+      "Edge Kalman (no graph)": {
+        "precision": 0.26438698915763137,
+        "recall": 0.13169921063564602,
+        "f1": 0.17581808097615084,
+        "true_positives": 317,
+        "false_positives": 882,
+        "missed": 2090
+      },
+      "Fog graph model": {
+        "precision": 0.4464012251148545,
+        "recall": 0.24221022019110927,
+        "f1": 0.31403178023161865,
+        "true_positives": 583,
+        "false_positives": 723,
+        "missed": 1824
+      }
+    },
+    "_meta": {
+      "horizon_min": 15,
+      "threshold_mph": 42.25,
+      "positive_rate_pct": 11.84939091915836,
+      "onset_events": 2407
+    }
+  },
+  "architectures": {
+    "cloud_only": {
+      "architecture": "cloud_only",
+      "mean_delay_adaptive_s": 15.830040136774148,
+      "mean_delay_fixedtime_s": 24.580562387889422,
+      "delay_reduction_pct": 35.599357382590085,
+      "control_input_MAE_mph": 3.1958244044936626,
+      "latency_ms": {
+        "p50": 160.78220725538665,
+        "p95": 184.69938338712538,
+        "mean": 161.3689925504784,
+        "max": 200.3464433094563
+      },
+      "uplink_kB": 2930.34375,
+      "uplink_kB_per_hour": 58.21875,
+      "messages": {
+        "edge_cloud": 604
+      },
+      "steps_uncontrolled": 0
+    },
+    "edge_only": {
+      "architecture": "edge_only",
+      "mean_delay_adaptive_s": 15.645471836441066,
+      "mean_delay_fixedtime_s": 24.580562387889422,
+      "delay_reduction_pct": 36.35022832451783,
+      "control_input_MAE_mph": 2.870958476825716,
+      "latency_ms": {
+        "p50": 3.5018578521253496,
+        "p95": 3.8247970553441135,
+        "mean": 3.504478786145454,
+        "max": 4.251516101669581
+      },
+      "uplink_kB": 485.15625,
+      "uplink_kB_per_hour": 9.638865894039734,
+      "messages": {
+        "edge_fog": 20700
+      },
+      "steps_uncontrolled": 0
+    },
+    "edge_fog_cloud": {
+      "architecture": "edge_fog_cloud",
+      "mean_delay_adaptive_s": 15.400608298962338,
+      "mean_delay_fixedtime_s": 24.580562387889422,
+      "delay_reduction_pct": 37.34639567665038,
+      "control_input_MAE_mph": 2.8645648420794028,
+      "latency_ms": {
+        "p50": 23.356874797777223,
+        "p95": 26.108771049507116,
+        "mean": 23.426538898421878,
+        "max": 28.98281463597307
+      },
+      "uplink_kB": 1173.5390625,
+      "uplink_kB_per_hour": 23.31534561258278,
+      "messages": {
+        "edge_fog": 37207,
+        "fog_cloud": 3216
+      },
+      "twin_sync_rmse_mph": 3.965042828242896,
+      "uplink_duty_cycle_pct": 29.758933998784272,
+      "congestion_alarms": 1037,
+      "detector_steps_flagged": 4466,
+      "persistently_faulty_detectors": 159,
+      "fusion_weight": 0.2,
+      "steps_uncontrolled": 0
+    }
+  },
+  "delta_sweep": [
+    {
+      "delta_mph": 0.5,
+      "uplink_kB": 2295.1171875,
+      "duty_cycle_pct": 68.03356048245193,
+      "twin_sync_rmse_mph": 3.7685442688277915,
+      "control_input_MAE_mph": 2.8405171825406352,
+      "mean_delay_s": 15.430695782247732
+    },
+    {
+      "delta_mph": 1.0,
+      "uplink_kB": 1675.6875,
+      "duty_cycle_pct": 46.89509549860832,
+      "twin_sync_rmse_mph": 3.8111424832215866,
+      "control_input_MAE_mph": 2.844891435526859,
+      "mean_delay_s": 15.423526695993681
+    },
+    {
+      "delta_mph": 2.0,
+      "uplink_kB": 1173.5390625,
+      "duty_cycle_pct": 29.758933998784272,
+      "twin_sync_rmse_mph": 3.965042828242896,
+      "control_input_MAE_mph": 2.8645648420794028,
+      "mean_delay_s": 15.400608298962338
+    },
+    {
+      "delta_mph": 4.0,
+      "uplink_kB": 932.6015625,
+      "duty_cycle_pct": 21.53677576222926,
+      "twin_sync_rmse_mph": 4.243911209473121,
+      "control_input_MAE_mph": 2.895697896508149,
+      "mean_delay_s": 15.412059591449406
+    },
+    {
+      "delta_mph": 8.0,
+      "uplink_kB": 874.2421875,
+      "duty_cycle_pct": 19.545221870301056,
+      "twin_sync_rmse_mph": 4.475007704807359,
+      "control_input_MAE_mph": 2.9309069154732557,
+      "mean_delay_s": 15.445102072172899
+    }
+  ],
+  "resilience": {
+    "cloud_only": {
+      "mean_delay_adaptive_s": 16.32365189863654,
+      "delay_reduction_pct": 33.59121878074267,
+      "steps_uncontrolled": 39
+    },
+    "edge_only": {
+      "mean_delay_adaptive_s": 15.645471836441066,
+      "delay_reduction_pct": 36.35022832451783,
+      "steps_uncontrolled": 0
+    },
+    "edge_fog_cloud": {
+      "mean_delay_adaptive_s": 15.400345130401782,
+      "delay_reduction_pct": 37.347466313507276,
+      "steps_uncontrolled": 0
+    },
+    "outage_steps": 39,
+    "outage_pct": 6.446280991735537
+  },
+  "what_if": {
+    "incident_sensors": [
+      61,
+      72,
+      113,
+      117
+    ],
+    "horizon_min": 30,
+    "n_roads_affected": 9,
+    "n_roads_spillover": 5,
+    "worst_roads": [
+      117,
+      61,
+      113,
+      140,
+      72,
+      190,
+      199,
+      205
+    ],
+    "mean_speed_loss_mph": 12.455149287328993,
+    "network_travel_time_increase_pct": 1.370416007268405,
+    "roads_degraded_a_level": 4,
+    "description": "lane-blocking incident on detector 773939 plus 3 adjacent links"
+  },
+  "meta": {
+    "dataset": "METR-LA / los-loop: 207 LA freeway detectors, 5-min mean speed",
+    "n_detectors": 207,
+    "n_timesteps": 2016,
+    "train_steps": 1411,
+    "test_steps": 605,
+    "n_fog_zones": 8,
+    "zone_sizes": [
+      31,
+      39,
+      32,
+      14,
+      8,
+      25,
+      29,
+      29
+    ]
+  },
+  "alarms_sample": [
+    {
+      "t": 1419,
+      "sensor": 51,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 43.96861313424319,
+      "v_pred": 42.124775299925105
+    },
+    {
+      "t": 1422,
+      "sensor": 56,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 42.61259264684491,
+      "v_pred": 39.42500037502251
+    },
+    {
+      "t": 1431,
+      "sensor": 56,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 45.22600884909651,
+      "v_pred": 41.988951139682094
+    },
+    {
+      "t": 1443,
+      "sensor": 80,
+      "from": "congested",
+      "to": "dense",
+      "v_now": 25.346097356362908,
+      "v_pred": 32.615362319902076
+    },
+    {
+      "t": 1470,
+      "sensor": 35,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 55.21352779306212,
+      "v_pred": 41.46760094227368
+    },
+    {
+      "t": 1473,
+      "sensor": 51,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 45.10369289927765,
+      "v_pred": 40.203644023671316
+    },
+    {
+      "t": 1482,
+      "sensor": 194,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 42.96486164501154,
+      "v_pred": 38.60083316238908
+    },
+    {
+      "t": 1482,
+      "sensor": 50,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 46.934909896387545,
+      "v_pred": 41.045009578648454
+    },
+    {
+      "t": 1482,
+      "sensor": 126,
+      "from": "free",
+      "to": "dense",
+      "v_now": 55.317275038473,
+      "v_pred": 40.51743040071954
+    },
+    {
+      "t": 1485,
+      "sensor": 51,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 43.59459791642476,
+      "v_pred": 36.981424106495304
+    },
+    {
+      "t": 1503,
+      "sensor": 56,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 43.269511538823735,
+      "v_pred": 41.13048337306129
+    },
+    {
+      "t": 1509,
+      "sensor": 77,
+      "from": "free",
+      "to": "dense",
+      "v_now": 61.96431152994324,
+      "v_pred": 41.17020660305991
+    },
+    {
+      "t": 1509,
+      "sensor": 84,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 50.91225151342635,
+      "v_pred": 37.20366627210409
+    },
+    {
+      "t": 1512,
+      "sensor": 8,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 49.64463189368157,
+      "v_pred": 32.40206526607234
+    },
+    {
+      "t": 1512,
+      "sensor": 9,
+      "from": "dense",
+      "to": "congested",
+      "v_now": 37.48458591159099,
+      "v_pred": 24.481016249379493
+    },
+    {
+      "t": 1512,
+      "sensor": 14,
+      "from": "free",
+      "to": "congested",
+      "v_now": 57.773004922147486,
+      "v_pred": 22.189156529515934
+    },
+    {
+      "t": 1512,
+      "sensor": 77,
+      "from": "dense",
+      "to": "congested",
+      "v_now": 29.41576819225187,
+      "v_pred": 20.461064183226302
+    },
+    {
+      "t": 1512,
+      "sensor": 88,
+      "from": "dense",
+      "to": "congested",
+      "v_now": 30.773668988608414,
+      "v_pred": 14.32386382047186
+    },
+    {
+      "t": 1512,
+      "sensor": 151,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 53.521434433820424,
+      "v_pred": 32.77375936062491
+    },
+    {
+      "t": 1512,
+      "sensor": 185,
+      "from": "free",
+      "to": "dense",
+      "v_now": 59.26374692594363,
+      "v_pred": 32.72183144298113
+    },
+    {
+      "t": 1515,
+      "sensor": 102,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 53.30352356629366,
+      "v_pred": 40.438193170908335
+    },
+    {
+      "t": 1515,
+      "sensor": 48,
+      "from": "free",
+      "to": "dense",
+      "v_now": 55.63966466784768,
+      "v_pred": 41.168734175982394
+    },
+    {
+      "t": 1515,
+      "sensor": 91,
+      "from": "congested",
+      "to": "dense",
+      "v_now": 28.800703966895103,
+      "v_pred": 35.17879459589732
+    },
+    {
+      "t": 1515,
+      "sensor": 4,
+      "from": "free",
+      "to": "dense",
+      "v_now": 62.76850855533897,
+      "v_pred": 39.59580513185543
+    },
+    {
+      "t": 1515,
+      "sensor": 12,
+      "from": "free",
+      "to": "dense",
+      "v_now": 61.8784841435728,
+      "v_pred": 40.159858265220564
+    },
+    {
+      "t": 1515,
+      "sensor": 41,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 44.04255365447917,
+      "v_pred": 39.31147594723597
+    },
+    {
+      "t": 1515,
+      "sensor": 100,
+      "from": "free",
+      "to": "dense",
+      "v_now": 63.807223153476635,
+      "v_pred": 40.79410637801952
+    },
+    {
+      "t": 1518,
+      "sensor": 70,
+      "from": "free",
+      "to": "dense",
+      "v_now": 58.363355243367245,
+      "v_pred": 35.195426008400226
+    },
+    {
+      "t": 1518,
+      "sensor": 122,
+      "from": "free",
+      "to": "congested",
+      "v_now": 56.71906468534541,
+      "v_pred": 28.893905004861686
+    },
+    {
+      "t": 1518,
+      "sensor": 8,
+      "from": "congested",
+      "to": "dense",
+      "v_now": 28.09817586212824,
+      "v_pred": 30.9497916845471
+    },
+    {
+      "t": 1518,
+      "sensor": 29,
+      "from": "stable",
+      "to": "congested",
+      "v_now": 44.373140198283146,
+      "v_pred": 20.417555530056482
+    },
+    {
+      "t": 1518,
+      "sensor": 187,
+      "from": "free",
+      "to": "dense",
+      "v_now": 60.27407422261092,
+      "v_pred": 37.038893781989586
+    },
+    {
+      "t": 1518,
+      "sensor": 87,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 43.161170539795776,
+      "v_pred": 39.06701709912807
+    },
+    {
+      "t": 1518,
+      "sensor": 150,
+      "from": "dense",
+      "to": "congested",
+      "v_now": 37.655302989544644,
+      "v_pred": 27.711430827316633
+    },
+    {
+      "t": 1521,
+      "sensor": 40,
+      "from": "dense",
+      "to": "congested",
+      "v_now": 35.286453729220575,
+      "v_pred": 28.26209788679283
+    },
+    {
+      "t": 1521,
+      "sensor": 103,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 53.63968825450365,
+      "v_pred": 40.68382650197663
+    },
+    {
+      "t": 1521,
+      "sensor": 29,
+      "from": "stable",
+      "to": "dense",
+      "v_now": 44.20772495580858,
+      "v_pred": 41.039898537375436
+    },
+    {
+      "t": 1521,
+      "sensor": 91,
+      "from": "dense",
+      "to": "congested",
+      "v_now": 30.231393938623167,
+      "v_pred": 28.653206930708148
+    },
+    {
+      "t": 1521,
+      "sensor": 100,
+      "from": "congested",
+      "to": "dense",
+      "v_now": 28.78379242332065,
+      "v_pred": 29.577436804641316
+    },
+    {
+      "t": 1521,
+      "sensor": 150,
+      "from": "congested",
+      "to": "dense",
+      "v_now": 28.792834469048284,
+      "v_pred": 31.822422157652646
+    }
+  ]
+}

@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F6F8FB">
+<title>Smart Traffic Digital Twin | Los Angeles</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F4F5F2;
+  --panel:#ffffff;
+  --panel-soft:#F5F7F4;
+  --line:#E1E6E0;
+  --line-strong:#CBD4CC;
+  --text:#26352E;
+  --muted:#64736A;
+  --subtle:#8B9990;
+  --primary:#356354;
+  --primary-soft:#EAF1ED;
+  --blue:#397395;
+  --teal:#39705E;
+  --teal-soft:#EAF2ED;
+  --amber:#B97822;
+  --red:#B84D40;
+  --green:#367B54;
+  --purple:#6D5BA6;
+  --shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.05);
+  --radius:12px;
+  --focus:#1D4ED8;
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-size:14px;line-height:1.55}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{color:var(--primary)}
+.app{min-height:100vh}
+.skip-link{position:absolute;left:12px;top:-40px;z-index:20;background:var(--primary);color:#fff;padding:8px 12px;border-radius:8px}
+.skip-link:focus{top:12px}
+.topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:24px;padding:0 28px;min-height:64px;background:#fff;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;min-width:220px}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center}
+.brand-mark svg{display:block}
+.brand strong{display:block;font-size:14px;font-weight:650;color:var(--text)}
+.brand small{color:var(--muted);font-size:12px}
+.nav{display:flex;align-items:center;gap:2px;overflow:auto;scrollbar-width:none}
+.nav button{border:0;background:transparent;color:var(--muted);padding:9px 11px;border-radius:8px;white-space:nowrap;font-weight:550}
+.nav button:hover{color:var(--text);background:var(--panel-soft)}
+.nav button.active{color:var(--primary);background:var(--primary-soft)}
+.nav button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.top-status{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(21,128,61,.12)}
+.container{max-width:1480px;margin:auto;padding:28px 30px 64px}
+.page{display:none}.page.active{display:block}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:2px 0 24px}
+.eyebrow{color:var(--primary);font-size:12px;font-weight:650}
+h1{font-size:26px;line-height:1.25;margin:6px 0 8px;font-weight:700;letter-spacing:-.02em}
+h2{font-size:16px;line-height:1.35;margin:0 0 4px;font-weight:650}
+h3{font-size:14px;margin:0;font-weight:650}
+p{color:var(--muted);margin:6px 0 0;max-width:78ch}
+.subhead{font-size:14px;color:var(--muted);max-width:68ch}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
+.two-col{grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr)}
+.three-col{grid-template-columns:repeat(3,minmax(0,1fr))}
+.panel,.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.panel{padding:20px}
+.kpi{padding:16px 18px;min-height:118px}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.kpi-icon{width:32px;height:32px;border-radius:8px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;flex-shrink:0}
+.kpi-icon.warn{background:#FEF3E2;color:var(--amber)}
+.kpi-icon.alert{background:#FBECEC;color:var(--red)}
+.kpi-icon.ok{background:#E8F6EE;color:var(--green)}
+.kpi-icon.teal{background:var(--teal-soft);color:var(--teal)}
+.kpi-icon svg{width:16px;height:16px}
+.kpi-label{color:var(--muted);font-size:13px;display:flex;gap:6px;align-items:center;font-weight:550}
+.kpi-value{font-size:26px;font-weight:700;letter-spacing:-.03em;margin:8px 0 0;color:var(--text)}
+.kpi-note{font-size:12px;color:var(--subtle);margin-top:4px}
+.accent{color:var(--blue)}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px}
+.panel-head p{font-size:13px}
+.tag{font-size:12px;color:var(--muted);padding:5px 9px;border:1px solid var(--line);border-radius:999px;white-space:nowrap;background:#fff}
+.tag.good{color:var(--green);border-color:#BBF7D0;background:#F0FDF4}
+.tag.warn{color:#B45309;border-color:#FDE68A;background:#FFFBEB}
+.tag.bad{color:var(--red);border-color:#FECACA;background:#FEF2F2}
+.info{display:inline-grid;place-items:center;border:1px solid var(--line-strong);border-radius:50%;width:16px;height:16px;color:var(--muted);font-size:11px;cursor:help;background:#fff}
+.chart{width:100%;height:260px;display:block}
+.chart.short{height:190px}
+.chart-wrap{position:relative;min-height:190px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;color:var(--muted);font-size:12px;margin-top:10px}
+.legend span{display:flex;align-items:center;gap:6px}
+.swatch{width:9px;height:9px;border-radius:50%;background:var(--blue)}
+.swatch.cyan{background:var(--teal)}.swatch.amber{background:var(--amber)}.swatch.red{background:var(--red)}
+.stack{display:grid;gap:2px}
+.alert-item{display:grid;grid-template-columns:8px 1fr auto;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+.alert-item:last-child{border-bottom:0}
+.alert-dot{height:8px;width:8px;border-radius:50%;background:var(--amber);margin-top:6px}
+.alert-item strong{font-size:13px}.alert-item small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.muted{color:var(--muted)}.small{font-size:12px}.empty{color:var(--muted);padding:22px 0;text-align:center}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.control{display:grid;gap:5px;min-width:140px}
+.control label{font-size:12px;color:var(--muted);font-weight:600}
+select,input[type=number],input[type=range]{background:#fff;color:var(--text);border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;min-height:38px}
+select:hover,input[type=number]:hover{border-color:#94A3B8}
+input[type=range]{padding:8px 0;border:0;min-height:20px;accent-color:var(--primary)}
+.btn{background:var(--primary);border:1px solid var(--primary);color:#fff;border-radius:8px;padding:9px 14px;font-weight:600}
+.btn:hover{background:#1E40AF;border-color:#1E40AF}
+.btn.secondary{background:#fff;color:var(--text);border-color:var(--line-strong)}
+.btn.secondary:hover{background:var(--panel-soft)}
+.btn.ghost{background:transparent;color:var(--muted);border-color:var(--line)}
+.btn.ghost:hover{color:var(--text);background:var(--panel-soft)}
+.btn:disabled{opacity:.58;cursor:wait}
+.btn.small{padding:7px 10px;font-size:13px}
+.simulation-runner{margin:-5px 0 18px;border-left:3px solid var(--primary)}
+.simulation-runner .panel-head{margin-bottom:14px}
+.simulation-settings{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:12px}
+.simulation-settings .control{min-width:0}
+.simulation-settings input{width:100%}
+.run-actions{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+.run-status{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;min-height:24px}
+.run-status::before{content:"";width:8px;height:8px;border-radius:50%;background:#9BA79F;flex:none}
+.run-status.running::before{background:var(--amber);box-shadow:0 0 0 4px rgba(185,120,34,.13);animation:status-pulse 1.4s ease-in-out infinite}
+.run-status.success::before{background:var(--green)}
+.run-status.error{color:#9B3E33}.run-status.error::before{background:var(--red)}
+@keyframes status-pulse{50%{box-shadow:0 0 0 7px rgba(185,120,34,0)}}
+.toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:14px}
+.canvas-shell{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.heatmap{width:100%;height:auto;display:block;image-rendering:pixelated}
+.heat-foot{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);background:#fff}
+.heat-scale{width:118px;height:8px;border-radius:6px;background:linear-gradient(90deg,#C2413B,#D97706,#15803D)}
+.network-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}
+.network-svg{width:100%;height:580px;display:block;background:#F8FAFC;border:1px solid var(--line);border-radius:10px}
+.node-link{stroke:#CBD5E1;stroke-opacity:.9}
+.node-link.active{stroke:var(--blue);stroke-opacity:1}
+.node-circle{stroke:#fff;stroke-width:2;cursor:pointer}
+.node-circle:hover{stroke:var(--primary);stroke-width:3}
+.node-circle.selected{stroke:var(--primary);stroke-width:3}
+.node-label{font-size:8px;fill:#475569;pointer-events:none;text-anchor:middle}
+.legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}
+.detail-list{display:grid;grid-template-columns:1fr auto;gap:9px 10px;font-size:13px;margin-top:15px}
+.detail-list dt{color:var(--muted)}.detail-list dd{margin:0;text-align:right;font-weight:600}
+.divider{height:1px;background:var(--line);margin:14px 0}
+.arch-flow{display:grid;grid-template-columns:repeat(7,minmax(0,auto));align-items:center;justify-content:center;gap:8px;padding:8px 4px 22px}
+.arch-step{background:var(--panel-soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:140px;text-align:center}
+.arch-step strong{display:block;font-size:13px}
+.arch-step span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.arch-arrow{color:var(--subtle);font-size:18px;text-align:center}
+.tier{border:1px solid var(--line);border-radius:10px;padding:16px;background:#fff;border-top:3px solid var(--blue)}
+.tier.fog{border-top-color:var(--teal)}
+.tier.cloud{border-top-color:#2563EB}
+.tier h3{font-size:15px;margin-bottom:4px}
+.tier p{font-size:13px}
+.metric-table{width:100%;border-collapse:collapse;font-size:13px}
+.metric-table th,.metric-table td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.metric-table th:first-child,.metric-table td:first-child{text-align:left}
+.metric-table th{color:var(--muted);font-weight:600;font-size:12px;background:#F8FAFC}
+.metric-table tr:last-child td{border-bottom:0}
+.metric-table tbody tr:hover{background:#F8FAFC}
+.table-scroll{overflow:auto}
+.chart-stat{display:flex;gap:22px;margin:3px 0 9px;flex-wrap:wrap}
+.chart-stat strong{font-size:18px}.chart-stat small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.callout{border:1px solid #F3E4C4;background:#FFFBEB;color:#7C5A1A;border-radius:10px;padding:12px 14px;font-size:13px}
+.scenario-result{margin-top:14px}
+.scenario-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
+.scenario-kpi{padding:12px;background:var(--panel-soft);border:1px solid var(--line);border-radius:10px}
+.scenario-kpi strong{display:block;font-size:18px}.scenario-kpi span{font-size:12px;color:var(--muted)}
+.health-badge{font-size:12px;font-weight:650;border-radius:999px;padding:3px 8px}
+.health-badge.nominal{color:var(--green);background:#E8F6EE}
+.health-badge.attention{color:#B45309;background:#FEF3E2}
+.health-row-attention{background:#FFFBEB}
+.footer-note{color:var(--subtle);font-size:12px;margin-top:16px}
+.toast{position:fixed;right:22px;bottom:22px;z-index:10;background:#0F172A;border:1px solid #0F172A;color:#F8FAFC;padding:11px 15px;border-radius:10px;box-shadow:0 10px 30px rgba(15,23,42,.18);opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
+.toast.show{opacity:1;transform:none}.toast.error{background:#7F1D1D;border-color:#7F1D1D;color:#FEE2E2}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.bar-track{height:10px;background:#E8EEF4;border-radius:8px;overflow:hidden}
+@media(max-width:1100px){
+  .topbar{gap:12px;padding:0 16px}
+  .brand{min-width:170px}
+  .nav button{padding:8px 9px}
+  .container{padding:22px 16px 50px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two-col{grid-template-columns:1fr}
+  .network-svg{height:500px}
+  .arch-flow{grid-template-columns:1fr;justify-items:center}
+  .arch-arrow{transform:rotate(90deg)}
+}
+@media(max-width:680px){
+  .topbar{height:auto;min-height:58px;flex-wrap:wrap;gap:6px;padding:10px 12px}
+  .brand{min-width:0}
+  .top-status{font-size:11px;margin-left:0}
+  .nav{order:3;width:100%}
+  .nav button{font-size:13px;padding:8px 9px}
+  .container{padding:18px 12px 40px}
+  .page-head{align-items:flex-start;flex-direction:column}
+  .kpis{gap:10px}
+  .kpi{padding:14px;min-height:104px}
+  .kpi-value{font-size:22px}
+  .three-col,.scenario-grid{grid-template-columns:1fr}
+  .network-layout{grid-template-columns:1fr}
+  .network-svg{height:410px}
+  .toolbar{align-items:flex-start;flex-direction:column}
+  .panel{padding:16px}
+  .simulation-settings{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .chart{height:220px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to dashboard content</a>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 1.5"/><path d="M4 12h2M18 12h2M12 4v2M12 18v2"/></svg>
+      </span>
+      <div><strong>Smart Traffic Digital Twin</strong><small>Los Angeles · METR-LA</small></div>
+    </div>
+    <nav class="nav" aria-label="Dashboard sections">
+      <button class="active" data-page="overview">Overview</button>
+      <button data-page="network">Traffic Network</button>
+      <button data-page="layers">System Architecture</button>
+      <button data-page="analytics">Forecasts</button>
+      <button data-page="scenario">Traffic Scenarios</button>
+      <button data-page="performance">Performance</button>
+      <button data-page="health">Sensor Health</button>
+      <button data-page="reports">Reports</button>
+    </nav>
+    <div class="top-status"><span class="pulse" aria-hidden="true"></span> Historical evaluation</div>
+  </header>
+  <main class="container" id="main">
+    <div id="dashboard-error" class="callout" hidden>Dashboard data is unavailable. Run <code>python run.py</code> and then <code>python build_dashboard.py</code> to regenerate it.</div>
+
+    <section id="page-overview" class="page active">
+      <div class="page-head"><div><div class="eyebrow">Traffic Monitoring Dashboard</div><h1>Smart Traffic Digital Twin</h1><div class="subhead">Monitor traffic conditions, congestion patterns, and system performance using Edge, Fog, and Cloud computing. This view replays historical detector data — it is not a live traffic feed.</div></div><span class="tag good" id="data-window">Evaluation dataset</span></div>
+      <article class="panel simulation-runner" aria-labelledby="simulation-heading">
+        <div class="panel-head"><div><h2 id="simulation-heading">Simulation settings</h2><p>Adjust the historical replay, then run the full traffic simulation with the project's detector data and models.</p></div><span class="tag">METR-LA · 5-minute data</span></div>
+        <div class="simulation-settings">
+          <div class="control"><label for="setting-delta">Edge reporting threshold (mph)</label><input id="setting-delta" type="number" min="0.5" max="8" step="0.5" value="2"></div>
+          <div class="control"><label for="setting-noise">Sensor noise (mph)</label><input id="setting-noise" type="number" min="0" max="5" step="0.1" value="1.5"></div>
+          <div class="control"><label for="setting-dropout">Sensor dropout (%)</label><input id="setting-dropout" type="number" min="0" max="2" step="0.1" value="0.3"></div>
+          <div class="control"><label for="setting-congestion">Congestion threshold (mph)</label><input id="setting-congestion" type="number" min="30" max="55" step="0.25" value="42.25"></div>
+        </div>
+        <div class="run-actions"><button class="btn" id="run-simulation" type="button">Run Simulation</button><div id="run-status" class="run-status" role="status" aria-live="polite">Showing the saved evaluation results.</div></div>
+      </article>
+      <div class="grid kpis" id="overview-kpis"></div>
+      <div class="grid two-col">
+        <article class="panel">
+          <div class="panel-head"><div><h2>Traffic Speed Trend</h2><p>Compare observed traffic speeds with the model's predicted speeds across the evaluation window.</p></div><span class="tag">5-minute intervals</span></div>
+          <canvas id="overview-chart" class="chart" role="img" aria-label="Measured and forecast average network speed"></canvas>
+          <div class="legend"><span><i class="swatch"></i>Observed mean speed</span><span><i class="swatch cyan"></i>15-minute forecast</span></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h2>Recent Traffic Alerts</h2><p>Areas where the system detected significant changes in traffic conditions.</p></div><span class="tag" id="alert-count"></span></div>
+          <div class="stack" id="alert-list"></div>
+        </article>
+      </div>
+      <div class="grid two-col" style="margin-top:16px">
+        <article class="panel">
+          <div class="panel-head"><div><h2>Speed Heatmap by Sensor</h2><p>Each row is a traffic sensor, grouped by fog zone. Columns are five-minute observations from the evaluation period.</p></div><span class="tag">Observed · mph</span></div>
+          <div class="canvas-shell"><canvas id="heatmap" class="heatmap" aria-label="Held-out speed by detector and interval"></canvas><div class="heat-foot"><span id="heat-readout">Hover or focus the chart to inspect readings</span><span class="heat-scale"></span><span>Congested → free-flowing</span></div></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h2>Architecture Snapshot</h2><p>How Cloud Only, Edge Only, and Edge + Fog + Cloud compared in the same simulation.</p></div><span class="tag">Held-out test</span></div>
+          <div class="table-scroll"><table class="metric-table" id="overview-architecture"></table></div>
+          <p class="footer-note">Delay is an illustrative Greenshields/Webster proxy. Outage behavior was tested with a simulated burst outage.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="page-network" class="page">
+      <div class="page-head"><div><div class="eyebrow">Sensor graph visualization</div><h1>Traffic Network Overview</h1><div class="subhead">A schematic of the road adjacency graph. Nodes are grouped by fog zone and do not represent geographic coordinates.</div></div><span class="tag">207 sensors · weighted road links</span></div>
+      <div class="toolbar">
+        <div class="controls">
+          <div class="control"><label for="network-zone">Fog zone</label><select id="network-zone"><option value="all">All zones</option></select></div>
+          <div class="control"><label for="congestion-threshold">Congestion alert threshold (mph)</label><input id="congestion-threshold" type="number" min="1" max="70" step="0.25" value="42.25"></div>
+          <div class="control"><label for="network-state">Traffic / sensor state</label><select id="network-state"><option value="all">All states</option><option value="normal">Normal</option><option value="slowing">Slowing</option><option value="congested">Congested</option><option value="attention">Needs attention</option></select></div>
+        </div>
+        <div class="controls"><button class="btn secondary small" id="zoom-in">Zoom in</button><button class="btn secondary small" id="zoom-out">Zoom out</button><button class="btn ghost small" id="zoom-reset">Reset view</button></div>
+      </div>
+      <div class="network-layout">
+        <div>
+          <svg id="network-svg" class="network-svg" viewBox="0 0 1000 620" role="img" aria-label="Schematic detector graph"></svg>
+          <div class="legend"><span><i class="legend-dot" style="background:var(--green)"></i>Normal</span><span><i class="legend-dot" style="background:var(--amber)"></i>Slowing</span><span><i class="legend-dot" style="background:var(--red)"></i>Congested</span><span><i class="legend-dot" style="background:var(--purple)"></i>Needs attention</span><span>Lines show supplied road connections</span></div>
+        </div>
+        <aside class="panel"><div class="panel-head"><div><h2>Selected Sensor</h2><p id="network-detail-hint">Select a node to inspect it and its neighbors.</p></div></div><div id="network-detail" class="empty">No sensor selected</div><div class="divider"></div><p class="small">The dataset includes road relationships but no validated latitude/longitude. This graph is not a map.</p></aside>
+      </div>
+    </section>
+
+    <section id="page-layers" class="page">
+      <div class="page-head"><div><div class="eyebrow">Edge, Fog, and Cloud</div><h1>System Architecture</h1><div class="subhead">How traffic readings move from roadside sensors through nearby processing to city-wide analytics — and keep working if the backhaul link is interrupted.</div></div></div>
+      <div class="panel">
+        <div class="arch-flow" role="img" aria-label="Traffic sensors to edge processing to fog layer to cloud analytics">
+          <div class="arch-step"><strong>Traffic Sensors</strong><span>Roadside detectors</span></div>
+          <div class="arch-arrow" aria-hidden="true">→</div>
+          <div class="arch-step"><strong>Edge Processing</strong><span>Near each sensor</span></div>
+          <div class="arch-arrow" aria-hidden="true">→</div>
+          <div class="arch-step"><strong>Fog Layer</strong><span>Nearby road zones</span></div>
+          <div class="arch-arrow" aria-hidden="true">→</div>
+          <div class="arch-step"><strong>Cloud Analytics</strong><span>City-wide insight</span></div>
+        </div>
+        <div class="grid three-col">
+          <article class="tier"><h3>Edge Layer</h3><p>Handles data close to the traffic sensors. It cleans noisy five-minute readings, flags missing or repeated values, and sends updates only when something meaningful changes.</p><dl class="detail-list" id="edge-layer-metrics"></dl></article>
+          <article class="tier fog"><h3>Fog Layer</h3><p>Processes and analyzes traffic information across nearby road zones. It keeps a local replica of road state, looks five and fifteen minutes ahead, and raises congestion alerts.</p><dl class="detail-list" id="fog-layer-metrics"></dl></article>
+          <article class="tier cloud"><h3>Cloud Layer</h3><p>Provides city-wide analytics, forecasting, and long-term insights. It combines zone summaries, produces the 30-minute forecast, and supports scenario comparison.</p><dl class="detail-list" id="cloud-layer-metrics"></dl></article>
+        </div>
+      </div>
+      <div class="grid two-col" style="margin-top:16px">
+        <article class="panel"><div class="panel-head"><div><h2>System Response Time and Data Usage</h2><p>Measured from the recorded hierarchical simulation.</p></div></div><div class="chart-stat" id="layer-latency"></div><div class="divider"></div><dl class="detail-list" id="layer-bandwidth"></dl></article>
+        <article class="panel"><div class="panel-head"><div><h2>Digital Twin Accuracy</h2><p>How closely the fog replica matches observed detector speeds.</p></div><span class="info" title="RMSE is root mean squared error. Here it measures speed difference between the simulated replica and observed speeds.">i</span></div><div class="chart-stat" id="twin-fidelity"></div><p class="small">The event-trigger threshold trades communication cost against replica fidelity. Values come from the project's threshold sweep, not an online tuning control.</p><div id="delta-sweep"></div></article>
+      </div>
+    </section>
+
+    <section id="page-analytics" class="page">
+      <div class="page-head"><div><div class="eyebrow">GraphGBT forecasting model</div><h1>Traffic Forecast Analysis</h1><div class="subhead">Compare actual traffic speeds with predictions generated by the forecasting model. Results use the project's trained GraphGBT model and the original training split.</div></div><span class="tag">Historical evaluation, not live predictions</span></div>
+      <div class="panel">
+        <div class="toolbar"><div class="controls">
+          <div class="control"><label for="analytics-detector">Traffic sensor</label><select id="analytics-detector"></select></div>
+          <div class="control"><label for="analytics-zone">Fog zone</label><select id="analytics-zone"><option value="all">All zones</option></select></div>
+          <div class="control"><label for="analytics-horizon">Forecast horizon</label><select id="analytics-horizon"></select></div>
+          <div class="control"><label for="analytics-range">Displayed test range</label><select id="analytics-range"><option value="48">Last 4 hours</option><option value="144">Last 12 hours</option><option value="all">All available</option></select></div>
+        </div><span class="tag" id="forecast-window"></span></div>
+        <div class="chart-stat" id="detector-metrics"></div>
+        <canvas id="forecast-chart" class="chart" role="img" aria-label="Observed and predicted detector speed"></canvas>
+        <div class="legend"><span><i class="swatch"></i>Observed speed</span><span><i class="swatch cyan"></i>GraphGBT forecast</span></div>
+        <div id="zone-metrics" class="divider"></div>
+        <canvas id="zone-forecast-chart" class="chart short" role="img" aria-label="Fog-zone mean observed and predicted speed" hidden></canvas>
+      </div>
+      <div class="grid two-col" style="margin-top:16px">
+        <article class="panel"><div class="panel-head"><div><h2>Model Comparison</h2><p>Network-wide mean absolute error (MAE) and root mean squared error (RMSE) by forecast horizon, in mph. Lower is better.</p></div><span class="info" title="MAE averages absolute speed error. RMSE penalizes larger errors more heavily. Lower values are better.">i</span></div><div class="table-scroll" id="model-comparison"></div></article>
+        <article class="panel"><div class="panel-head"><div><h2>Congestion-Onset Detection</h2><p>Among roads currently above the speed threshold, identify those that fall below it within 15 minutes.</p></div></div><div class="table-scroll" id="onset-metrics"></div><p class="footer-note">Precision is the share of alerts that were correct; recall is the share of observed onsets detected. F1 balances the two.</p></article>
+      </div>
+    </section>
+
+    <section id="page-scenario" class="page">
+      <div class="page-head"><div><div class="eyebrow">What-if analysis</div><h1>Traffic Scenario Explorer</h1><div class="subhead">Explore how a traffic disruption at one location could affect connected roads in the network.</div></div><span class="tag warn">Graph-diffusion estimate · not a full traffic simulation</span></div>
+      <div class="grid two-col">
+        <article class="panel"><div class="panel-head"><div><h2>Configure a disruption</h2><p>These controls change the calculated scenario. They do not rewrite the archived observations.</p></div></div>
+          <div class="controls">
+            <div class="control"><label for="scenario-detector">Incident location</label><select id="scenario-detector"></select></div>
+            <div class="control"><label for="scenario-severity">Initial speed reduction</label><select id="scenario-severity"><option value="10">Minor · 10 mph</option><option value="20" selected>Moderate · 20 mph</option><option value="35">Severe · 35 mph</option></select></div>
+            <div class="control"><label for="scenario-hops">Connected road steps</label><select id="scenario-hops"><option value="0">Incident only</option><option value="1" selected>1 connected step</option><option value="2">2 connected steps</option><option value="3">3 connected steps</option></select></div>
+            <div class="control"><label for="scenario-architecture">Architecture reference</label><select id="scenario-architecture"><option value="edge_fog_cloud">Edge + Fog + Cloud</option><option value="edge_only">Edge Only</option><option value="cloud_only">Cloud Only</option></select></div>
+          </div>
+          <div style="margin-top:16px"><button class="btn" id="run-scenario">Run Scenario Analysis</button></div>
+          <div class="callout" style="margin-top:16px">The project's model-driven what-if result is shown below as a reference. Interactive runs use a transparent, weighted graph-diffusion rule over the current observed speed frame; they do not retrain or re-run the GraphGBT forecast. Incident duration, arbitrary sensor noise and outage duration are not simulated by this static dashboard.</div>
+          <div id="scenario-result" class="scenario-result"></div>
+        </article>
+        <article class="panel"><div class="panel-head"><div><h2>Speed impact by sensor</h2><p>Baseline is the last observed evaluation frame. Counterfactual impact is derived from graph links.</p></div></div><canvas id="scenario-chart" class="chart short" role="img" aria-label="Counterfactual speed impact on affected detectors"></canvas><div id="scenario-architecture-reference"></div></article>
+      </div>
+      <article class="panel" style="margin-top:16px"><div class="panel-head"><div><h2>Saved model-driven scenario</h2><p>Precomputed by CloudTwin.what_if using the trained 30-minute city model.</p></div><span class="tag">Actual project output</span></div><div id="baseline-scenario"></div></article>
+    </section>
+
+    <section id="page-performance" class="page">
+      <div class="page-head"><div><div class="eyebrow">Architecture comparison</div><h1>System Performance Comparison</h1><div class="subhead">Trade-offs measured by replaying the same evaluation data through Cloud Only, Edge Only, and Edge + Fog + Cloud.</div></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Measured architecture outcomes</h2><p>Lower delay, control-input error, latency, and uplink are better. The outage column counts fallback intervals.</p></div></div><div class="table-scroll" id="performance-table"></div><div class="callout" id="architecture-summary" style="margin-top:14px"></div></div>
+      <div class="grid two-col" style="margin-top:16px">
+        <article class="panel"><div class="panel-head"><div><h2>Network Data Usage vs. Twin Accuracy</h2><p>Existing sweep across configured event-trigger thresholds.</p></div></div><div id="performance-sweep"></div></article>
+        <article class="panel"><div class="panel-head"><div><h2>Resilience under simulated WAN outages</h2><p>Measured on the evaluation period with burst-style outages.</p></div></div><div class="table-scroll" id="resilience-table"></div><p class="footer-note">Resilience here means local control can continue; it does not model real network equipment or outage repair.</p></article>
+      </div>
+    </section>
+
+    <section id="page-health" class="page">
+      <div class="page-head"><div><div class="eyebrow">Monitoring</div><h1>Traffic Sensor Health</h1><div class="subhead">Rule-based screening of the simulation's noisy feed. These flags are not a diagnosis of live detector hardware.</div></div><span class="tag warn">Injected faults are simulated</span></div>
+      <div class="grid kpis" id="health-kpis"></div>
+      <div class="panel"><div class="toolbar"><div><h2>Sensor screening</h2><p class="small">Missing readings and unusual readings are counted over the evaluation window.</p></div><div class="controls"><div class="control"><label for="health-filter">Show</label><select id="health-filter"><option value="all">All sensors</option><option value="attention">Needs attention</option><option value="nominal">Healthy</option></select></div><div class="control"><label for="health-zone">Fog zone</label><select id="health-zone"><option value="all">All zones</option></select></div></div></div>
+        <div class="table-scroll"><table class="metric-table" id="health-table"></table></div>
+      </div>
+      <div class="grid two-col" style="margin-top:16px">
+        <article class="panel"><div class="panel-head"><div><h2>Outage behavior</h2><p>Response measured by architecture in the existing burst-outage run.</p></div></div><div id="health-outage"></div></article>
+        <article class="panel"><div class="panel-head"><div><h2>How to read these flags</h2></div></div><p><b>Healthy</b> means the screening rules did not raise a flag. <b>Needs attention</b> is a screening threshold, not a claim that the corresponding real sensor is faulty. <b>Missing readings</b> are generated dropouts in the synthetic raw feed. <b>Unusual readings</b> (candidate spikes) are values changed by at least half the injected spike magnitude relative to the cleaned dataset.</p><p>Edge nodes continue local filtering when higher-tier communication is interrupted. Cloud-only control falls back to fixed timing during its simulated WAN outage; edge-only and hierarchical tiers remain locally available.</p></article>
+      </div>
+    </section>
+
+    <section id="page-reports" class="page">
+      <div class="page-head"><div><div class="eyebrow">Downloads</div><h1>Reports and Data Export</h1><div class="subhead">Download results from the embedded simulation payload. No network connection or server is required.</div></div></div>
+      <div class="grid three-col">
+        <article class="panel"><div class="panel-head"><div><h2>Filtered sensor data</h2><p>CSV for the selected fog zone and time window, with actual speed and available forecasts.</p></div></div><div class="controls"><div class="control"><label for="export-zone">Fog zone</label><select id="export-zone"><option value="all">All zones</option></select></div><div class="control"><label for="export-range">Time range</label><select id="export-range"><option value="48">Last 4 hours</option><option value="144">Last 12 hours</option><option value="all">All test data</option></select></div><div class="control"><label for="export-horizon">Forecast horizon</label><select id="export-horizon"></select></div></div><button class="btn" style="margin-top:15px" id="export-csv">Download CSV</button></article>
+        <article class="panel"><div class="panel-head"><div><h2>Simulation summary</h2><p>Original calculated metrics, architecture results, and experiment settings.</p></div></div><button class="btn secondary" id="export-json">Download results JSON</button><div class="footer-note">Includes the existing simulation output; does not embed local machine paths.</div></article>
+        <article class="panel"><div class="panel-head"><div><h2>Experiment report</h2><p>Concise text report with dataset window, model, metrics, and limitations.</p></div></div><button class="btn secondary" id="export-report">Download report</button><div class="footer-note">The report notes that the interactive scenario is a reduced-order graph-diffusion estimate.</div></article>
+      </div>
+      <article class="panel" style="margin-top:16px"><div class="panel-head"><div><h2>Experiment configuration</h2><p>Metadata embedded when this dashboard was generated.</p></div></div><dl class="detail-list" id="report-meta"></dl></article>
+    </section>
+    <footer class="footer-note">METR-LA / los-loop observations · 207 freeway sensors · five-minute speeds · first 70% for training, remaining 30% for evaluation. Delay values are illustrative physics proxies, not microsimulation outputs. Forecast traces are historical evaluation predictions, not live forecasts.</footer>
+  </main>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+const DATA = /*%%PAYLOAD%%*/null;
+if (!DATA || !DATA.results) {
+  document.getElementById("dashboard-error").hidden = false;
+} else {
+(() => {
+"use strict";
+const $ = (s, root=document) => root.querySelector(s);
+const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+const R=DATA.rows,C=DATA.cols, ids=DATA.ids,zones=DATA.zones, results=DATA.results;
+const bytesOf = s => {const raw=atob(s), out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out;};
+const speedBytes=bytesOf(DATA.speeds), predictions={};
+for(const [horizon,obj] of Object.entries(DATA.forecasts)) predictions[horizon]={rows:obj.rows,values:bytesOf(obj.values)};
+const originalIndices=DATA.originalIndices || ids.map((_,i)=>i);
+const efg=results.architectures.edge_fog_cloud, cloud=results.architectures.cloud_only, edge=results.architectures.edge_only;
+const byIndex=new Map(ids.map((id,i)=>[i,id]));
+let selectedDetector=0, selectedNetworkNode=-1, networkScale=1, scenarioImpact=null, activeThreshold=DATA.congestionV;
+const COL={blue:"#397395",teal:"#39705E",red:"#B84D40",green:"#367B54",amber:"#B97822",purple:"#76648F"};
+const ICO={
+  speed:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 1.5"/></svg>`,
+  sensor:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12a7 7 0 0 1 14 0"/><path d="M8.5 12a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>`,
+  congestion:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.5" r=".8" fill="currentColor"/><path d="M12 4 3.8 19h16.4L12 4z"/></svg>`,
+  alert:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4a6 6 0 0 1 6 6c0 4 1.2 5.2 1.2 5.2H4.8S6 14 6 10a6 6 0 0 1 6-6z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>`,
+  forecast:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 16l5-5 4 4 7-8"/><path d="M15 7h5v5"/></svg>`,
+  network:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="12" r="2"/><circle cx="18" cy="7" r="2"/><circle cx="18" cy="17" r="2"/><path d="M8 12h8M16.4 8.4 8 12M16.4 15.6 8 12"/></svg>`,
+  latency:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M13 3 5 14h7l-1 7 8-11h-7l1-7z"/></svg>`,
+  twin:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8a8 8 0 0 1 8-4"/><path d="M20 16a8 8 0 0 1-8 4"/><path d="M7 7l-3 1 1-3M17 17l3-1-1 3"/></svg>`
+};
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function fmt(n,d=1){return Number.isFinite(Number(n))?Number(n).toFixed(d):"—";}
+function observed(i,t){return speedBytes[i*C+t]/2;}
+function predAt(h,i,t){const f=predictions[String(h)];return f&&t<f.rows?f.values[i*f.rows+t]/2:null;}
+function condition(speed){return speed<DATA.vFree*.45?"congested":speed<activeThreshold?"slowing":"normal";}
+function levelLabel(s){return s==="congested"?"Congested":s==="slowing"?"Slowing":s==="normal"?"Normal":"Needs attention";}
+function latest(i){return DATA.latestSpeeds[i];}
+function meanAt(t){let s=0;for(let i=0;i<R;i++)s+=observed(i,t);return s/R;}
+function zoneOptions(sel){const el=$(sel);for(let z=0;z<Math.max(...zones)+1;z++)el.insertAdjacentHTML("beforeend",`<option value="${z}">Zone ${z+1}</option>`);}
+function detectorOptions(sel){const el=$(sel);el.innerHTML=ids.map((id,i)=>`<option value="${i}">${esc(id)} · Zone ${zones[i]+1}</option>`).join("");}
+function fillHorizon(sel){$(sel).innerHTML=DATA.horizons.map(h=>`<option value="${h}">${h} minutes</option>`).join("");}
+function toast(message,error=false){const el=$("#toast");el.textContent=message;el.classList.toggle("error",error);el.classList.add("show");setTimeout(()=>el.classList.remove("show"),3000);}
+function download(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function kpiCard(icon,tone,label,value,note){return `<article class="kpi"><div class="kpi-top"><div class="kpi-label">${esc(label)} <span class="info" title="${esc(note)}">i</span></div><span class="kpi-icon ${tone||""}" aria-hidden="true">${ICO[icon]||""}</span></div><div class="kpi-value">${esc(value)}</div><div class="kpi-note">${esc(note)}</div></article>`;}
+
+function initSimulationRunner(){
+  const button=$("#run-simulation"),status=$("#run-status");let activeJob=null;
+  const show=(message,kind="")=>{status.textContent=message;status.className=`run-status ${kind}`.trim();};
+  const busy=value=>{button.disabled=value;button.textContent=value?"Simulation running…":"Run Simulation";};
+  const apiUnavailableMessage="Simulation API not found here. Run python app.py from the project folder, then open http://127.0.0.1:5000/.";
+  const apiRequest=async(url,options)=>{
+    let response;
+    try{response=await fetch(url,options);}catch{
+      const error=new Error(apiUnavailableMessage);error.serviceUnavailable=true;throw error;
+    }
+    const contentType=(response.headers.get("content-type")||"").toLowerCase();
+    if(!contentType.includes("application/json")){
+      const error=new Error(response.status===404||response.status===405?apiUnavailableMessage:`Simulation API returned a non-JSON response (HTTP ${response.status}). Start python app.py; if it is already running, check its terminal for errors.`);
+      error.serviceUnavailable=true;throw error;
+    }
+    let data;
+    try{data=await response.json();}catch{
+      const error=new Error(apiUnavailableMessage);error.serviceUnavailable=true;throw error;
+    }
+    if(!response.ok){const error=new Error(data.error||`Simulation request failed (HTTP ${response.status}).`);error.serviceUnavailable=response.status===404||response.status===405;throw error;}
+    return data;
+  };
+  if(location.protocol==="file:"){
+    button.disabled=true;show("Offline snapshot. Start the web app to run a simulation.");return;
+  }
+  const applySettings=settings=>{
+    if(!settings)return;
+    $("#setting-delta").value=settings.delta_send;
+    $("#setting-noise").value=settings.sensor_noise_std;
+    $("#setting-dropout").value=settings.dropout_percent;
+    $("#setting-congestion").value=settings.congestion_v;
+  };
+  const poll=async id=>{
+    if(activeJob!==id)return;
+    try{
+      const data=await apiRequest("/api/simulation/status",{cache:"no-store"});
+      if(data.id!==id)return;
+      if(data.status==="running"){
+        show(`${data.phase||"Running simulation"} · full replay can take 10+ minutes on CPU-limited hosts`,"running");
+        window.setTimeout(()=>poll(id),1800);return;
+      }
+      activeJob=null;busy(false);
+      if(data.status==="completed"){
+        applySettings(data.settings);show("Simulation complete. Updating charts and reports…","success");
+        window.setTimeout(()=>window.location.reload(),500);return;
+      }
+      show(`Simulation failed: ${data.error||"Check the server log for details."}`,"error");
+    }catch(error){
+      if(error.serviceUnavailable){activeJob=null;busy(false);button.disabled=true;show(error.message,"error");return;}
+      show(`Connection interrupted; checking again. ${error.message}`,"error");
+      window.setTimeout(()=>poll(id),3000);
+    }
+  };
+  button.addEventListener("click",async()=>{
+    const settings={
+      delta_send:Number($("#setting-delta").value),
+      sensor_noise_std:Number($("#setting-noise").value),
+      dropout_percent:Number($("#setting-dropout").value),
+      congestion_v:Number($("#setting-congestion").value),
+    };
+    busy(true);show("Starting the simulation…","running");
+    try{
+      const data=await apiRequest("/api/simulation",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(settings)});
+      activeJob=data.id;poll(data.id);
+    }catch(error){busy(false);if(error.serviceUnavailable)button.disabled=true;show(error.message,"error");}
+  });
+  apiRequest("/api/simulation/status",{cache:"no-store"}).then(data=>{
+    applySettings(data.settings);
+    if(data.status==="running"){
+      activeJob=data.id;busy(true);show(`${data.phase||"Running simulation"} · full replay can take 10+ minutes on CPU-limited hosts`,"running");poll(data.id);
+    }else if(data.status==="completed"){
+      const time=data.updated_at?new Date(data.updated_at).toLocaleTimeString():"just now";
+      show(`Latest simulation completed at ${time}.`,"success");
+    }else if(data.status==="failed")show(`Previous simulation failed: ${data.error||"Check the server log for details."}`,"error");
+  }).catch(error=>{
+    if(error.serviceUnavailable){button.disabled=true;show(error.message,"error");}
+    else show(`Showing saved results. Simulation service status is unavailable: ${error.message}`,"error");
+  });
+}
+
+function lineChart(canvas,series,labels,unit="mph"){
+  const box=canvas.getBoundingClientRect(), ratio=window.devicePixelRatio||1, w=Math.max(280,box.width),h=Math.max(160,box.height);
+  canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);const ctx=canvas.getContext("2d");ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,w,h);
+  const pad={l:43,r:12,t:14,b:27},vals=series.flatMap(s=>s.values).filter(Number.isFinite);
+  if(!vals.length){ctx.fillStyle="#64748B";ctx.fillText("No forecast values are available for this selection.",pad.l,h/2);return;}
+  let min=Math.floor(Math.min(...vals)/5)*5,max=Math.ceil(Math.max(...vals)/5)*5;if(max===min)max=min+1;
+  const X=i=>pad.l+(i/Math.max(labels.length-1,1))*(w-pad.l-pad.r),Y=v=>h-pad.b-(v-min)/(max-min)*(h-pad.t-pad.b);
+  ctx.font="12px Segoe UI, Arial";ctx.lineWidth=1;ctx.strokeStyle="#E2E8F0";ctx.fillStyle="#64748B";
+  for(let n=0;n<=4;n++){const val=min+(max-min)*n/4,y=Y(val);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.fillText(val.toFixed(0),5,y+3);}
+  series.forEach(s=>{ctx.beginPath();ctx.strokeStyle=s.color;ctx.lineWidth=s.width||2;s.values.forEach((v,i)=>{if(!Number.isFinite(v))return;if(i===0||!Number.isFinite(s.values[i-1]))ctx.moveTo(X(i),Y(v));else ctx.lineTo(X(i),Y(v));});ctx.stroke();});
+  ctx.fillStyle="#64748B";ctx.fillText(labels[0]||"",pad.l,h-7);const last=labels[labels.length-1]||"";ctx.textAlign="right";ctx.fillText(last,w-pad.r,h-7);ctx.textAlign="left";ctx.fillText(unit,w-pad.r-30,pad.t+2);
+}
+function barsHTML(items,unit="",lower=true){
+  const max=Math.max(...items.map(x=>Number(x.value)||0),1e-6);
+  return `<div class="stack">${items.map(x=>`<div style="display:grid;grid-template-columns:110px 1fr 62px;gap:9px;align-items:center;font-size:12px"><span>${esc(x.label)}</span><div class="bar-track"><i style="display:block;height:100%;width:${Math.max(1,Number(x.value)/max*100)}%;background:${x.color||'var(--teal)'}"></i></div><b style="text-align:right">${fmt(x.value,1)}${unit}</b></div>`).join("")}</div>`;
+}
+
+// Navigation
+$$(".nav button").forEach(btn=>btn.addEventListener("click",()=>{ $$(".nav button").forEach(b=>b.classList.toggle("active",b===btn));$$(".page").forEach(p=>p.classList.toggle("active",p.id===`page-${btn.dataset.page}`));window.scrollTo({top:0,behavior:"smooth"});setTimeout(drawActivePage,40);}));
+function drawActivePage(){if($("#page-overview").classList.contains("active")){drawOverviewChart();drawHeatmap();}if($("#page-analytics").classList.contains("active"))drawForecast();if($("#page-scenario").classList.contains("active")&&scenarioImpact)drawScenarioChart(scenarioImpact);if($("#page-network").classList.contains("active"))drawNetwork();}
+window.addEventListener("resize",()=>{clearTimeout(window.__resizeChart);window.__resizeChart=setTimeout(drawActivePage,100);});
+
+// Overview and alert data
+function initOverview(){
+  $("#congestion-threshold").value=String(DATA.congestionV);
+  const mean=DATA.meanSpeedMph, congested=DATA.latestCongested;
+  const best5=results.forecasting["5min"]["GraphGBT (twin)"], meta=results.meta;
+  const kpis=[
+    ["speed","","Average Traffic Speed",`${fmt(mean,1)} mph`,"Mean across the evaluation window"],
+    ["sensor","","Active Traffic Sensors",String(R),"METR-LA freeway loop detectors"],
+    ["congestion","warn","Currently Congested Roads",`${congested} / ${R}`,`Threshold ${fmt(DATA.congestionV,1)} mph · last observed frame`],
+    ["alert","alert","Traffic Alerts Detected",String(efg.congestion_alarms),"Fog-layer congestion alerts during the simulation"],
+    ["forecast","teal","Forecast Accuracy",`${fmt(best5.MAE,2)} mph MAE`,"GraphGBT · 5-minute horizon · lower is better"],
+    ["network","","Network Data Usage",`${fmt(efg.uplink_kB_per_hour,1)} kB/h`,"Uplink bandwidth · hierarchical simulation"],
+    ["latency","teal","System Response Time",`${fmt(efg.latency_ms.p95,1)} ms`,"Control-loop latency · Edge + Fog + Cloud · p95"],
+    ["twin","","Digital Twin Accuracy",`${fmt(efg.twin_sync_rmse_mph,2)} mph`,"Synchronization error (RMSE)"]
+  ];
+  $("#overview-kpis").innerHTML=kpis.map(x=>kpiCard(...x)).join("");
+  $("#data-window").textContent=`${meta.test_steps} evaluation intervals · ${DATA.stepMin}-min steps`;
+  $("#overview-architecture").innerHTML=`<thead><tr><th>Architecture</th><th>p95 response time</th><th>Uplink / hour</th><th>Uncontrolled intervals</th></tr></thead><tbody>${[["Cloud Only",cloud],["Edge Only",edge],["Edge + Fog + Cloud",efg]].map(([name,a])=>`<tr><td>${name}</td><td>${fmt(a.latency_ms.p95,1)} ms</td><td>${fmt(a.uplink_kB_per_hour,1)} kB</td><td>${a.steps_uncontrolled}</td></tr>`).join("")}</tbody>`;
+  const alerts=results.alarms_sample||[];
+  const chosen=alerts.slice(-6).reverse();
+  $("#alert-count").textContent=`${alerts.length} samples`;
+  $("#alert-list").innerHTML=chosen.length?chosen.map(a=>{const idx=originalIndices.indexOf(a.sensor),id=idx>=0?ids[idx]:`detector ${a.sensor}`;return `<div class="alert-item"><i class="alert-dot"></i><div><strong>${esc(id)} · ${esc(a.from)} → ${esc(a.to)}</strong><small>Forecast ${fmt(a.v_pred,1)} mph · observed ${fmt(a.v_now,1)} mph · zone ${idx>=0?zones[idx]+1:"—"}</small></div><span class="tag">+15 min</span></div>`;}).join(""):`<div class="empty">No alert samples were saved with the current results. Total alert count remains available above.</div>`;
+  drawOverviewChart();drawHeatmap();
+}
+function drawOverviewChart(){const count=Math.min(C,144),start=C-count,labels=[],actual=[],forecast=[];for(let t=start;t<C;t+=Math.max(1,Math.floor(count/60))){labels.push(`${Math.floor((DATA.startStep+t)*DATA.stepMin/60)%24}:00`);actual.push(meanAt(t));let s=0,n=0;for(let i=0;i<R;i++){const p=predAt(15,i,t);if(p!==null){s+=p;n++;}}forecast.push(n?s/n:NaN);}lineChart($("#overview-chart"),[{values:actual,color:COL.blue},{values:forecast,color:COL.teal}],labels);}
+function drawHeatmap(){
+  const cv=$("#heatmap");if(!cv)return;const ctx=cv.getContext("2d"),w=Math.max(250,cv.clientWidth),scale=w/C,h=Math.max(120,R*scale);
+  cv.width=C;cv.height=R;cv.style.height=`${h}px`;
+  const image=ctx.createImageData(C,R);for(let i=0;i<R*C;i++){const v=speedBytes[i]/2,t=Math.max(0,Math.min(1,v/DATA.vFree));let color=t<.5?[183+144*t,83+100*t,84-5*t]:[255-178*(t-.5),133+76*(t-.5),81+95*(t-.5)];image.data[i*4]=color[0];image.data[i*4+1]=color[1];image.data[i*4+2]=color[2];image.data[i*4+3]=255;}ctx.putImageData(image,0,0);
+  cv.onmousemove=e=>{const b=cv.getBoundingClientRect(),i=Math.floor((e.clientY-b.top)/b.height*R),t=Math.floor((e.clientX-b.left)/b.width*C);if(i>=0&&i<R&&t>=0&&t<C)$("#heat-readout").textContent=`Sensor ${ids[i]} · Zone ${zones[i]+1} · evaluation step ${DATA.startStep+t} · ${observed(i,t)} mph`;};
+  cv.onmouseleave=()=>$("#heat-readout").textContent="Hover or focus the chart to inspect readings";
+}
+
+// Network schematic uses real adjacency; positions only group nodes by zone.
+function graphLayout(){
+  const centers=Array.from({length:Math.max(...zones)+1},(_,z)=>({x:150+(z%4)*235,y:155+Math.floor(z/4)*300}));
+  const zCount=Array(zones.length).fill(0);
+  return zones.map((z,i)=>{const order=zCount[z]++,total=zones.filter(x=>x===z).length,angle=order/Math.max(total,1)*Math.PI*2,r=24+Math.sqrt(total)*9;return{x:centers[z].x+Math.cos(angle)*r,y:centers[z].y+Math.sin(angle)*r,zone:z};});
+}
+const positions=graphLayout(),neighbors=Array.from({length:R},()=>[]);
+DATA.edges.forEach(([a,b,w])=>{neighbors[a].push([b,w]);neighbors[b].push([a,w]);});
+function drawNetwork(){
+  const svg=$("#network-svg");if(!svg)return;const zf=$("#network-zone").value,stateFilter=$("#network-state").value;let s=`<g id="network-content" transform="translate(${500*(1-networkScale)} ${310*(1-networkScale)}) scale(${networkScale})">`;
+  const focus=selectedNetworkNode;
+  DATA.edges.forEach(([a,b,w])=>{const linked=focus===a||focus===b||(focus>=0&&(neighbors[focus]||[]).some(n=>n[0]===a||n[0]===b));const alpha=Math.min(.65,.12+Number(w)*.35);s+=`<line class="node-link${linked?' active':''}" x1="${positions[a].x}" y1="${positions[a].y}" x2="${positions[b].x}" y2="${positions[b].y}" stroke-width="${linked?1.4:.65}" opacity="${alpha}"/>`;});
+  positions.forEach((p,i)=>{const c=condition(latest(i)),health=DATA.health[i].status==="attention",matchesZone=zf==="all"||Number(zf)===zones[i],matchesState=stateFilter==="all"||(stateFilter==="attention"?health:stateFilter===c),linked=focus===i||(focus>=0&&neighbors[focus].some(n=>n[0]===i));const fill=health?COL.purple:c==="congested"?COL.red:c==="slowing"?COL.amber:COL.green;s+=`<g opacity="${matchesZone&&matchesState?1:.14}" data-node="${i}" tabindex="0" role="button" aria-label="Detector ${esc(ids[i])}, zone ${p.zone+1}, ${levelLabel(health?'attention':c)}"><circle class="node-circle${focus===i?' selected':''}" cx="${p.x}" cy="${p.y}" r="${linked?7:5.4}" fill="${fill}"/><title>Sensor ${esc(ids[i])} · zone ${p.zone+1} · ${latest(i)} mph</title></g>`;});
+  s+="</g>";svg.innerHTML=s;
+  svg.querySelectorAll("[data-node]").forEach(g=>{const i=Number(g.dataset.node);g.addEventListener("click",()=>selectNetworkNode(i));g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectNetworkNode(i);}});});
+  svg.querySelectorAll("[data-node]").forEach(g=>{const p=positions[Number(g.dataset.node)];if(!g.querySelector("text")){const t=document.createElementNS("http://www.w3.org/2000/svg","text");t.setAttribute("x",p.x);t.setAttribute("y",p.y-9);t.setAttribute("class","node-label");t.textContent=ids[Number(g.dataset.node)];g.appendChild(t);}});
+}
+function selectNetworkNode(i){selectedNetworkNode=i;drawNetwork();const c=condition(latest(i)),h=DATA.health[i];$("#network-detail-hint").textContent=`Sensor ${ids[i]} · linked neighbors highlighted`;
+  const last5Origin=C-1-5/DATA.stepMin,last15Origin=C-1-15/DATA.stepMin;
+  $("#network-detail").innerHTML=`<div><span class="tag ${c==='congested'?'bad':c==='slowing'?'warn':'good'}">${levelLabel(c)}</span>${h.status==='attention'?' <span class="health-badge attention">Needs attention</span>':''}</div><dl class="detail-list"><dt>Sensor ID</dt><dd>${esc(ids[i])}</dd><dt>Fog zone</dt><dd>${zones[i]+1}</dd><dt>Observed speed</dt><dd>${latest(i)} mph</dd><dt>5-min forecast</dt><dd>${fmt(predAt(5,i,last5Origin),1)} mph*</dd><dt>15-min forecast</dt><dd>${fmt(predAt(15,i,last15Origin),1)} mph*</dd><dt>Traffic state</dt><dd>${levelLabel(c)}</dd><dt>Missing readings</dt><dd>${h.missing}</dd><dt>Unusual readings</dt><dd>${h.candidate_spikes}</dd><dt>Connected links</dt><dd>${neighbors[i].length}</dd></dl><p class="footer-note">*Historical evaluation forecast at the nearest available origin; not a live estimate.</p>`;
+}
+$("#network-zone").addEventListener("change",drawNetwork);$("#network-state").addEventListener("change",drawNetwork);
+$("#congestion-threshold").addEventListener("change",e=>{const value=Number(e.target.value);if(!Number.isFinite(value)||value<1||value>70){e.target.value=String(activeThreshold);toast("Threshold must be between 1 and 70 mph.",true);return;}activeThreshold=value;drawNetwork();toast(`Network graph threshold set to ${fmt(activeThreshold,2)} mph. Existing evaluation results are unchanged.`);});
+$("#zoom-in").onclick=()=>{networkScale=Math.min(2.2,networkScale+.2);drawNetwork();};$("#zoom-out").onclick=()=>{networkScale=Math.max(.6,networkScale-.2);drawNetwork();};$("#zoom-reset").onclick=()=>{networkScale=1;selectedNetworkNode=-1;drawNetwork();};
+
+// Analytics: predictions align to the future observed target at origin + horizon.
+function drawForecast(){
+  const i=Number($("#analytics-detector").value||0),h=Number($("#analytics-horizon").value||5),f=predictions[String(h)],range=$("#analytics-range").value;
+  if(!f){$("#forecast-chart").getContext("2d").clearRect(0,0,300,200);return;}
+  const n=f.rows,count=range==="all"?n:Math.min(n,Number(range)),start=n-count,stride=Math.max(1,Math.floor(count/160)),offset=h/DATA.stepMin,actual=[],predicted=[],labels=[];
+  let ae=0,se=0,k=0;
+  for(let t=start;t<n;t++){const p=predAt(h,i,t),a=observed(i,t+offset);if(p===null)continue;const err=p-a;ae+=Math.abs(err);se+=err*err;k++;if((t-start)%stride===0||t===n-1){actual.push(a);predicted.push(p);labels.push(`step ${DATA.startStep+t+offset}`);}}
+  $("#forecast-window").textContent=`${k} forecast targets · sensor ${ids[i]}`;
+  $("#detector-metrics").innerHTML=`<div><strong>${fmt(ae/Math.max(k,1),2)} mph</strong><small>MAE · mean absolute error</small></div><div><strong>${fmt(Math.sqrt(se/Math.max(k,1)),2)} mph</strong><small>RMSE · root mean squared error</small></div><div><strong>${h} min</strong><small>Forecast horizon</small></div>`;
+  lineChart($("#forecast-chart"),[{values:actual,color:COL.blue},{values:predicted,color:COL.teal}],labels);
+  drawZoneAnalytics(h);
+}
+function drawZoneAnalytics(h){
+  const z=$("#analytics-zone").value,canvas=$("#zone-forecast-chart");
+  if(z==="all"){canvas.hidden=true;$("#zone-metrics").textContent="Choose a fog zone to calculate its pooled error and view the zone-mean trend.";return;}
+  const members=ids.map((_,i)=>i).filter(i=>zones[i]===Number(z)),f=predictions[String(h)],n=f.rows,offset=h/DATA.stepMin;
+  let abs=0,square=0,count=0;const actual=[],forecast=[],labels=[];
+  const stride=Math.max(1,Math.floor(n/140));
+  for(let t=0;t<n;t++){
+    let a=0,p=0;
+    for(const i of members){const v=observed(i,t+offset),q=predAt(h,i,t);a+=v;p+=q;const e=q-v;abs+=Math.abs(e);square+=e*e;count++;}
+    if(t%stride===0||t===n-1){actual.push(a/members.length);forecast.push(p/members.length);labels.push(`step ${DATA.startStep+t+offset}`);}
+  }
+  $("#zone-metrics").innerHTML=`<b>Zone ${Number(z)+1} aggregate · ${members.length} sensors · ${h}-minute horizon</b><p class="small">Pooled MAE ${fmt(abs/count,2)} mph · pooled RMSE ${fmt(Math.sqrt(square/count),2)} mph. Zone mean compares measured and predicted speeds across sensors.</p>`;
+  canvas.hidden=false;lineChart(canvas,[{values:actual,color:COL.blue},{values:forecast,color:COL.teal}],labels);
+}
+function initAnalytics(){
+  detectorOptions("#analytics-detector");fillHorizon("#analytics-horizon");
+  $("#analytics-detector").value=selectedDetector;
+  $("#analytics-detector").onchange=()=>{selectedDetector=Number($("#analytics-detector").value);drawForecast();};
+  $("#analytics-horizon").onchange=drawForecast;$("#analytics-range").onchange=drawForecast;
+  $("#analytics-zone").onchange=()=>{const z=$("#analytics-zone").value;const options=ids.map((id,i)=>({id,i})).filter(x=>z==="all"||zones[x.i]===Number(z));$("#analytics-detector").innerHTML=options.map(x=>`<option value="${x.i}">${esc(x.id)} · Zone ${zones[x.i]+1}</option>`).join("");selectedDetector=Number($("#analytics-detector").value);drawForecast();};
+  const F=results.forecasting,hz=Object.keys(F),models=Object.keys(F[hz[0]]);
+  $("#model-comparison").innerHTML=`<table class="metric-table"><thead><tr><th>Model</th>${hz.map(x=>`<th>${esc(x)} MAE</th><th>${esc(x)} RMSE</th>`).join("")}</tr></thead><tbody>${models.map(m=>`<tr><td>${esc(m)}</td>${hz.map(x=>`<td>${fmt(F[x][m].MAE,2)}</td><td>${fmt(F[x][m].RMSE,2)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  const onset=results.congestion_detection.congestion_onset,order=["Persistence","Edge Kalman (no graph)","Fog graph model"];
+  $("#onset-metrics").innerHTML=`<table class="metric-table"><thead><tr><th>Method</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>${order.map(n=>`<tr><td>${esc(n)}</td><td>${fmt(onset[n].precision*100,1)}%</td><td>${fmt(onset[n].recall*100,1)}%</td><td>${fmt(onset[n].f1,3)}</td></tr>`).join("")}</tbody></table><p class="footer-note">${results.congestion_detection._meta.onset_events.toLocaleString()} onset events · threshold ${results.congestion_detection._meta.threshold_mph} mph · ${results.congestion_detection._meta.horizon_min} minutes ahead.</p>`;
+  drawForecast();
+}
+
+function initLayers(){
+  $("#edge-layer-metrics").innerHTML=`<dt>Traffic sensors</dt><dd>${R}</dd><dt>Injected missing readings</dt><dd>${DATA.health.reduce((s,x)=>s+x.missing,0)}</dd><dt>Flagged sensor-steps</dt><dd>${efg.detector_steps_flagged.toLocaleString()}</dd><dt>Local response time · p95</dt><dd>${fmt(edge.latency_ms.p95,1)} ms</dd>`;
+  $("#fog-layer-metrics").innerHTML=`<dt>Fog zones</dt><dd>${results.meta.n_fog_zones}</dd><dt>Forecast horizons</dt><dd>5 and 15 min</dd><dt>Traffic alerts</dt><dd>${efg.congestion_alarms}</dd><dt>Fog loop response · p95</dt><dd>${fmt(efg.latency_ms.p95,1)} ms</dd>`;
+  $("#cloud-layer-metrics").innerHTML=`<dt>City-wide sensors</dt><dd>${R}</dd><dt>Long forecast</dt><dd>30 min</dd><dt>Cloud-only response · p95</dt><dd>${fmt(cloud.latency_ms.p95,1)} ms</dd><dt>Outage fallback intervals</dt><dd>${results.resilience.cloud_only.steps_uncontrolled}</dd>`;
+  $("#layer-latency").innerHTML=`<div><strong>${fmt(efg.latency_ms.p50,1)} ms</strong><small>p50 end-to-end</small></div><div><strong>${fmt(efg.latency_ms.p95,1)} ms</strong><small>p95 end-to-end</small></div><div><strong>${fmt(efg.latency_ms.mean,1)} ms</strong><small>mean end-to-end</small></div>`;
+  $("#layer-bandwidth").innerHTML=`<dt>Hierarchical data usage</dt><dd>${fmt(efg.uplink_kB_per_hour,1)} kB / hour</dd><dt>Cloud-only data usage</dt><dd>${fmt(cloud.uplink_kB_per_hour,1)} kB / hour</dd><dt>Event-trigger duty cycle</dt><dd>${fmt(efg.uplink_duty_cycle_pct,1)}%</dd><dt>Digital twin accuracy</dt><dd>${fmt(efg.twin_sync_rmse_mph,2)} mph RMSE</dd>`;
+  $("#twin-fidelity").innerHTML=`<div><strong>${fmt(efg.twin_sync_rmse_mph,2)} mph</strong><small>Synchronization error (RMSE)</small></div><div><strong>${fmt(efg.uplink_duty_cycle_pct,1)}%</strong><small>Intervals with an edge report</small></div>`;
+  $("#delta-sweep").innerHTML=barsHTML(results.delta_sweep.map(d=>({label:`δ ${d.delta_mph} mph`,value:d.twin_sync_rmse_mph,color:COL.teal}))," mph",false);
+}
+
+// Graph diffusion scenario. A neighbor receives 35% of the upstream impact,
+// attenuated by its normalized supplied edge weight; each next hop attenuates again.
+function runScenario(){
+  const source=Number($("#scenario-detector").value),severity=Number($("#scenario-severity").value),hops=Number($("#scenario-hops").value),archName=$("#scenario-architecture").value;
+  if(!Number.isInteger(source)||source<0||source>=R||!Number.isFinite(severity)||severity<=0){toast("Choose a valid detector and severity.",true);return;}
+  const base=Array.from({length:R},(_,i)=>latest(i)),impact=Array(R).fill(0),distance=Array(R).fill(-1),queue=[source];
+  impact[source]=Math.min(severity,Math.max(0,base[source]-1));distance[source]=0;
+  for(let q=0;q<queue.length;q++){const u=queue[q];if(distance[u]>=hops)continue;const maxWeight=Math.max(...neighbors[u].map(n=>n[1]),1e-9);for(const [v,weight] of neighbors[u]){if(distance[v]>=0)continue;distance[v]=distance[u]+1;impact[v]=impact[u]*.35*(weight/maxWeight);queue.push(v);}}
+  const alt=base.map((v,i)=>Math.max(1,v-impact[i])),affected=impact.map((x,i)=>({i,x})).filter(x=>x.x>=1);
+  const tt0=base.reduce((s,v)=>s+1/Math.max(v,1),0),tt1=alt.reduce((s,v)=>s+1/Math.max(v,1),0),pct=(tt1-tt0)/tt0*100;
+  scenarioImpact={base,alt,impact,affected,source,hops,severity,archName,pct};
+  const a=results.architectures[archName], affectedName=affected.length?affected.slice().sort((x,y)=>y.x-x.x).slice(0,8).map(x=>`${esc(ids[x.i])} (${fmt(x.x,1)} mph)`).join(", "):"No neighboring detector exceeded the 1 mph impact threshold.";
+  $("#scenario-result").innerHTML=`<div class="scenario-grid"><div class="scenario-kpi"><strong>${affected.length}</strong><span>sensors affected (&gt;1 mph)</span></div><div class="scenario-kpi"><strong>${affected.filter(x=>x.i!==source).length}</strong><span>connected spillover sensors</span></div><div class="scenario-kpi"><strong>−${fmt(impact[source],1)} mph</strong><span>incident sensor speed</span></div><div class="scenario-kpi"><strong>+${fmt(pct,2)}%</strong><span>travel-time proxy across network</span></div></div><p><b>Most affected:</b> ${affectedName}</p><p class="footer-note">Calculation: source speed drops by the selected amount; each connected hop receives 35% of the prior impact scaled by its relative adjacency weight. Network travel time is Σ(1/speed), an illustrative proxy—not measured journey time.</p>`;
+  const archLabel={edge_fog_cloud:"Edge + Fog + Cloud",edge_only:"Edge Only",cloud_only:"Cloud Only"}[archName]||archName.replaceAll("_"," ");
+  $("#scenario-architecture-reference").innerHTML=`<div class="divider"></div><h3>${esc(archLabel)} · measured reference</h3><dl class="detail-list"><dt>System response time · p95</dt><dd>${fmt(a.latency_ms.p95,1)} ms</dd><dt>Network data usage</dt><dd>${fmt(a.uplink_kB_per_hour,1)} kB/h</dd><dt>Uncontrolled under test outage</dt><dd>${a.steps_uncontrolled} intervals</dd></dl><p class="footer-note">Architecture numbers are separate evaluation results; scenario controls do not alter them.</p>`;
+  drawScenarioChart(scenarioImpact);toast("Scenario calculated from the supplied road graph.");
+}
+function drawScenarioChart(s){
+  const items=s.affected.slice().sort((a,b)=>b.x-a.x).slice(0,14),labels=items.map(x=>ids[x.i]),vals=[{values:items.map(x=>s.base[x.i]),color:COL.blue},{values:items.map(x=>s.alt[x.i]),color:COL.red}];lineChart($("#scenario-chart"),vals,labels,"mph");
+}
+function initScenario(){
+  detectorOptions("#scenario-detector");const firstIncident=originalIndices.indexOf(results.what_if.incident_sensors[0]);$("#scenario-detector").value=String(Math.max(0,firstIncident));
+  $("#run-scenario").onclick=runScenario;
+  const w=results.what_if, mapped=w.incident_sensors.map(i=>{const j=originalIndices.indexOf(i);return j>=0?ids[j]:String(i);});
+  const worst=w.worst_roads.map(i=>{const j=originalIndices.indexOf(i);return esc(j>=0?ids[j]:i);}).join(", ");
+  $("#baseline-scenario").innerHTML=`<div class="scenario-grid"><div class="scenario-kpi"><strong>${w.n_roads_affected}</strong><span>roads affected by model</span></div><div class="scenario-kpi"><strong>${w.n_roads_spillover}</strong><span>spillover links</span></div><div class="scenario-kpi"><strong>${fmt(w.mean_speed_loss_mph,1)} mph</strong><span>mean speed loss</span></div><div class="scenario-kpi"><strong>+${fmt(w.network_travel_time_increase_pct,2)}%</strong><span>travel-time proxy</span></div></div><p><b>Incident sensors:</b> ${mapped.map(esc).join(", ")} · <b>horizon:</b> ${w.horizon_min} minutes · <b>top impacted:</b> ${worst}</p><p class="footer-note">${esc(w.description)}. This saved baseline was produced by the existing CloudTwin model-based counterfactual; it is not recalculated by the interactive reduced-order tool.</p>`;
+  runScenario();
+}
+
+function initPerformance(){
+  const rows=[["Cloud Only",cloud,results.resilience.cloud_only],["Edge Only",edge,results.resilience.edge_only],["Edge + Fog + Cloud",efg,results.resilience.edge_fog_cloud]];
+  $("#performance-table").innerHTML=`<table class="metric-table"><thead><tr><th>Architecture</th><th>Control-input MAE</th><th>Delay proxy / vehicle</th><th>p95 response time</th><th>Uplink / hour</th><th>Outage fallback</th><th>Onset detection</th></tr></thead><tbody>${rows.map(([n,a,r])=>`<tr><td>${n}</td><td>${fmt(a.control_input_MAE_mph,2)} mph</td><td>${fmt(a.mean_delay_adaptive_s,2)} s</td><td>${fmt(a.latency_ms.p95,1)} ms</td><td>${fmt(a.uplink_kB_per_hour,1)} kB</td><td>${r.steps_uncontrolled} intervals</td><td>${n==="Edge Only"?"Edge KF":n==="Cloud Only"?"Graph model":`Fog F1 ${fmt(results.congestion_detection.congestion_onset["Fog graph model"].f1,3)}`}</td></tr>`).join("")}</tbody></table>`;
+  const faster=cloud.latency_ms.p95/Math.max(efg.latency_ms.p95,1e-9),saving=(1-efg.uplink_kB_per_hour/cloud.uplink_kB_per_hour)*100;
+  $("#architecture-summary").textContent=`On this evaluation replay, Edge Only has the lowest measured control-loop latency (${fmt(edge.latency_ms.p95,1)} ms p95). Edge + Fog + Cloud combines graph-based onset detection (F1 ${fmt(results.congestion_detection.congestion_onset["Fog graph model"].f1,3)}) with ${fmt(saving,0)}% less uplink than Cloud Only. Cloud Only accuracy/context comes with ${fmt(faster,1)}× the hierarchical p95 latency. Delay values differ only modestly and remain illustrative physics proxies.`;
+  $("#performance-sweep").innerHTML=barsHTML(results.delta_sweep.map(d=>({label:`δ ${d.delta_mph} mph`,value:d.duty_cycle_pct,color:COL.blue})),"% transmission");
+  $("#resilience-table").innerHTML=`<table class="metric-table"><thead><tr><th>Architecture</th><th>Outage delay</th><th>Fixed-time reduction</th><th>Fallback intervals</th></tr></thead><tbody>${rows.map(([n,a,r])=>`<tr><td>${n}</td><td>${fmt(r.mean_delay_adaptive_s,2)} s</td><td>${fmt(r.delay_reduction_pct,1)}%</td><td>${r.steps_uncontrolled}</td></tr>`).join("")}</tbody></table><p class="footer-note">Test outage affected ${results.resilience.outage_steps} intervals (${fmt(results.resilience.outage_pct,1)}% of the evaluation window).</p>`;
+}
+
+function initHealth(){
+  const misses=DATA.health.reduce((s,x)=>s+x.missing,0),spikes=DATA.health.reduce((s,x)=>s+x.candidate_spikes,0),stuck=DATA.health.reduce((s,x)=>s+x.stuck_episodes,0),attention=DATA.health.filter(x=>x.status==="attention").length;
+  $("#health-kpis").innerHTML=[
+    ["alert","warn","Needs Attention",String(attention),"Rule-based screening flags"],
+    ["sensor","","Missing Readings",String(misses),"Held-out simulated feed"],
+    ["congestion","alert","Unusual Readings",String(spikes),"Threshold-based anomaly candidates"],
+    ["twin","ok","Repeated-reading episodes",String(stuck),"Stuck-sensor rule · zero means none detected"]
+  ].map(x=>kpiCard(...x)).join("");
+  $("#health-filter").onchange=renderHealth;$("#health-zone").onchange=renderHealth;
+  const r=results.resilience;$("#health-outage").innerHTML=`<table class="metric-table"><thead><tr><th>Architecture</th><th>Outage period delay</th><th>Uncontrolled intervals</th></tr></thead><tbody>${[["Cloud Only",r.cloud_only],["Edge Only",r.edge_only],["Edge + Fog + Cloud",r.edge_fog_cloud]].map(([n,x])=>`<tr><td>${n}</td><td>${fmt(x.mean_delay_adaptive_s,2)} s/veh</td><td>${x.steps_uncontrolled}</td></tr>`).join("")}</tbody></table><p class="footer-note">${r.outage_steps} simulated outage intervals (${fmt(r.outage_pct,1)}%).</p>`;
+  renderHealth();
+}
+function renderHealth(){
+  const state=$("#health-filter").value,zf=$("#health-zone").value;
+  const list=ids.map((id,i)=>({id,i,h:DATA.health[i]})).filter(x=>(state==="all"||x.h.status===state)&&(zf==="all"||zones[x.i]===Number(zf)));
+  $("#health-table").innerHTML=`<thead><tr><th>Sensor</th><th>Fog zone</th><th>Latest observed speed</th><th>Status</th><th>Missing readings</th><th>Unusual readings</th><th>Stuck episodes</th></tr></thead><tbody>${list.map(x=>`<tr class="${x.h.status==='attention'?'health-row-attention':''}"><td>${esc(x.id)}</td><td>${zones[x.i]+1}</td><td>${latest(x.i)} mph</td><td><span class="health-badge ${x.h.status}">${x.h.status==='attention'?'Needs attention':'Healthy'}</span></td><td>${x.h.missing}</td><td>${x.h.candidate_spikes}</td><td>${x.h.stuck_episodes}</td></tr>`).join("")}</tbody>`;
+}
+
+function initReports(){
+  fillHorizon("#export-horizon");
+  const meta=results.meta;$("#report-meta").innerHTML=`<dt>Dataset</dt><dd>${esc(meta.dataset)}</dd><dt>Traffic sensors</dt><dd>${meta.n_detectors}</dd><dt>Training intervals</dt><dd>${meta.train_steps}</dd><dt>Evaluation intervals</dt><dd>${meta.test_steps}</dd><dt>Sampling step</dt><dd>${DATA.stepMin} minutes</dd><dt>Forecast model</dt><dd>${esc(DATA.model.toUpperCase())}</dd><dt>Fog zones</dt><dd>${meta.n_fog_zones}</dd><dt>Evaluation configuration</dt><dd>Seeded simulation · original split</dd>`;
+  $("#export-csv").onclick=()=>{
+    const zone=$("#export-zone").value,range=$("#export-range").value,h=Number($("#export-horizon").value),offset=h/DATA.stepMin,n=predictions[String(h)].rows,count=range==="all"?n:Math.min(n,Number(range)),start=n-count;
+    const lines=[["detector_id","fog_zone","heldout_step","observed_speed_mph","forecast_speed_mph"].join(",")];
+    for(let i=0;i<R;i++){if(zone!=="all"&&zones[i]!==Number(zone))continue;for(let t=start;t<n;t++){lines.push([JSON.stringify(ids[i]),zones[i]+1,DATA.startStep+t+offset,observed(i,t+offset),predAt(h,i,t)].join(","));}}
+    download("traffic-twin-filtered-data.csv",lines.join("\r\n"),"text/csv;charset=utf-8");toast("Filtered CSV downloaded.");
+  };
+  $("#export-json").onclick=()=>{download("traffic-twin-results.json",JSON.stringify({metadata:results.meta,model:DATA.model,step_minutes:DATA.stepMin,results},null,2),"application/json");toast("Simulation results downloaded.");};
+  $("#export-report").onclick=()=>{
+    const f=results.forecasting,mae=f["5min"]["GraphGBT (twin)"].MAE,al=results.architectures.edge_fog_cloud;
+    const zone=$("#export-zone").value==="all"?"All fog zones":`Zone ${Number($("#export-zone").value)+1}`;
+    const range=$("#export-range").value==="all"?"All held-out forecast targets":`Last ${$("#export-range").value} five-minute targets`;
+    const horizon=$("#export-horizon").value,architecture=$("#scenario-architecture").value.replaceAll("_"," ");
+    const scenarioId=ids[Number($("#scenario-detector").value)]||"not selected";
+    const text=`SMART TRAFFIC DIGITAL TWIN — EXPERIMENT REPORT
+Dataset: ${results.meta.dataset}
+Evaluation window: ${results.meta.test_steps} held-out intervals at ${DATA.stepMin}-minute steps (first ${results.meta.train_steps} intervals used for training).
+Forecast configuration: ${DATA.model.toUpperCase()} graph model; horizons ${DATA.horizons.join(", ")} minutes.
+Selected export scope: ${zone}; ${range}; ${horizon}-minute forecast.
+Selected architecture reference: ${architecture}.
+What-if controls: incident detector ${scenarioId}; severity ${$("#scenario-severity").value} mph; ${$("#scenario-hops").value} graph hops.
+
+KEY RESULTS
+5-minute GraphGBT network MAE: ${mae.toFixed(3)} mph
+Hierarchical control-loop p95: ${al.latency_ms.p95.toFixed(2)} ms
+Hierarchical uplink rate: ${al.uplink_kB_per_hour.toFixed(2)} kB/hour
+Replica synchronization RMSE: ${al.twin_sync_rmse_mph.toFixed(3)} mph
+Fog congestion onset F1: ${results.congestion_detection.congestion_onset["Fog graph model"].f1.toFixed(3)}
+
+OBSERVATIONS
+The graph-aware fog model's onset F1 is ${results.congestion_detection.congestion_onset["Fog graph model"].f1.toFixed(3)}; its held-out 5-minute MAE is ${mae.toFixed(3)} mph. The edge-fog-cloud architecture uses ${al.uplink_kB_per_hour.toFixed(2)} kB/hour with ${al.latency_ms.p95.toFixed(2)} ms p95 control-loop latency. Filtered time-series values and forecasts can be downloaded separately as CSV.
+
+LIMITATIONS
+Traffic-delay values use a Greenshields/Webster proxy, not a microsimulation. The interactive what-if view uses a transparent graph-diffusion counterfactual; only the saved baseline scenario was produced by CloudTwin's trained model. Sensor dropouts/spikes and WAN outages are simulated. Dashboard data is historical, not live.
+`;
+    download("traffic-twin-experiment-report.txt",text,"text/plain;charset=utf-8");toast("Experiment report downloaded.");
+  };
+}
+
+// Shared selectors, views and initial rendering.
+initSimulationRunner();
+zoneOptions("#network-zone");zoneOptions("#analytics-zone");zoneOptions("#health-zone");zoneOptions("#export-zone");
+detectorOptions("#analytics-detector");detectorOptions("#scenario-detector");fillHorizon("#analytics-horizon");fillHorizon("#export-horizon");
+initOverview();initAnalytics();initLayers();initScenario();initPerformance();initHealth();initReports();
+drawNetwork();
+})();
+}
+</script>
+</body>
+</html>
